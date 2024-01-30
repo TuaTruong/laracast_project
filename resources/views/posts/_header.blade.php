@@ -6,22 +6,11 @@
     <div class="space-y-2 lg:space-y-0 lg:space-x-4 mt-4">
 
         <!--  Category -->
-        <div class="relative flex lg:inline-flex items-center bg-gray-100 rounded-xl">
-            <x-dropdown>
-                <x-slot name="trigger">
-                    <button @click.away="show=false" class="flex w-full">
-                        {{ isset($currentCategory) ? $currentCategory->name : 'Categories' }}
-                        <x-icon name="down-arrow" style="right:12px" class="absolute pointer-events-none"/>
-                    </button>
-                </x-slot>
+        <div class="relative flex lg:inline-flex items-center bg-gray-100 rounded-xl" style="min-width: 150px">
+            <x-category-dropdown>
 
+            </x-category-dropdown>
 
-                <x-dropdown-item href="/" :active="request()->routeIs('home')">All</x-dropdown-item>
-
-                @foreach ($categories as $category)
-                    <x-dropdown-item href="/categories/{{ $category->slug }}" :active="request()->is('*' . $category->slug) ">{{$category->name}}</x-dropdown-item>
-                @endforeach
-            </x-dropdown>
         </div>
 
         {{-- <!-- Other Filters -->
@@ -49,8 +38,11 @@
         <!-- Search -->
         <div class="relative flex lg:inline-flex items-center bg-gray-100 rounded-xl px-3 py-2">
             <form method="GET" action="#">
+                @if (request("category"))
+                    <input type="hidden" name="category" value="{{request('category')}}">
+                @endif
                 <input type="text" name="search" placeholder="Find something"
-                    class="bg-transparent placeholder-black font-semibold text-sm">
+                    class="bg-transparent placeholder-black font-semibold text-sm" value="{{request('search')}}">
             </form>
         </div>
     </div>

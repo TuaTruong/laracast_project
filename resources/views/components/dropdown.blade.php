@@ -1,6 +1,6 @@
 @props(["trigger"])
 
-<div x-data="{ show: false }" class="py-2 pl-3 pr-9 text-sm font-semibold" class="display:none">
+<div x-data="{ show: false }" class="py-2 pl-3 pr-9 text-sm font-semibold" class="display:none;">
     <div @click ="show=!show">
         {{$trigger}}
     </div>

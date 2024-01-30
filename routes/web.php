@@ -1,56 +1,39 @@
 <?php
 
-use App\Models\Category;
-use App\Models\Post;
-use App\Models\User;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
-Route::get('/', function () {
-    // DB::listen(function ($query) {
-    //     logger($query->sql);
-    // });
-    $posts = Post::latest();
-    if(request("search")){
-        $posts
-        ->where("title","like","%".request("search")."%")
-        ->orWhere("body","like","%".request("search")."%")
-        ->orWhere("excerpt","like","%".request("search")."%");
-    }
 
-    return view('posts',[
-        "posts" => $posts->get(),
-        "categories" => Category::latest()->get(),
-    ]);
-}) -> name("home");
+// Route::get("/ping", function(){
+//     // require_once('/path/to/MailchimpMarketing/vendor/autoload.php');
+//     $mailchimp = new \MailchimpMarketing\ApiClient();
 
-Route::get('posts/{post:slug}', function (Post $post) {
-    return view('post',[
-        "post" => $post,
-    ]);
-});
+//     $mailchimp->setConfig([
+//         'apiKey' => config("services.mailchimp.key"),
+//         'server' => 'us21'
+//     ]);
 
-Route::get("categories/{category:slug}", function (Category $category) {
-    return view("posts", [
-        "posts"=> $category->posts,
-        "currentCategory" => $category,
-        "categories" => Category::latest()->get(),
-    ]);
-});
+//     $response = $mailchimp->ping->get();
+//     dd($response);
+// });
 
-Route::get("authors/{author:username}", function (User $author) {
-    return view("posts", [
-        "posts"=> $author->posts,
-        "categories" => Category::latest()->get(),
-    ]);
-});
+Route::get('/', [PostController::class,"index"]) -> name("home");
+Route::get('posts/{post:slug}', [PostController::class,'show']);
+Route::post('posts/{post:slug}/comments', [CommentController::class,'storeCommentOnPost']);
+
+Route::get("/register",[RegisterController::class,"create"])->middleware("guest");
+Route::post("/register",[RegisterController::class,"store"])->middleware("guest");
+
+
+Route::get("/login",[SessionController::class,"create"])->middleware("guest");
+Route::post("/login",[SessionController::class,"store"])->middleware("guest");
+
+
+Route::post("/logout",[SessionController::class,"destroy"])->middleware("auth");
+Route::post("/sessions",[SessionController::class,"destroy"])->middleware("auth");
+
+
+Route::get('admin/posts/create',[PostController::class,'create'])->middleware("admin");
